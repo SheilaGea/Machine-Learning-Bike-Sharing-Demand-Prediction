@@ -55,7 +55,7 @@ The goal was to use **supervised machine learning models** to predict bike renta
 
 ## 🌐 Live Demo
 👉 [Streamlit App](https://share.streamlit.io/SheilaGea/Machine-Learning-Bike-Sharing-Demand-Prediction/main/app.py)  
-*(link will work after deployment)*  
+
 
 ---
 
