@@ -95,3 +95,5 @@ Multidisciplinary Designer & Data Analyst
  · 📂 GitHub
 
 ✨ This project was developed as part of a Machine Learning bootcamp project (2025).
+
+
