@@ -5,7 +5,7 @@ from joblib import load
 import os
 
 st.set_page_config(page_title="Machine Learning — Bike Sharing Demand Prediction", page_icon="🚲", layout="wide")
-st.title("Machine Learning —  Bike Sharing Demand Prediction. 🚲 ")
+st.title("Machine Learning: 🚴🏻‍♀️ Bike Sharing Demand Prediction. ")
 st.markdown(" ")
 
 # -------- Model loaders (no saving here) --------
@@ -36,7 +36,8 @@ def load_day_csv():
 
 # -------- tabs --------
 
-tab1, tab4, tab2, tab3, tab6, tab5 = st.tabs([
+tab0, tab1, tab4, tab2, tab3, tab6, tab5 = st.tabs([
+    "🎯 Goals & Value",
     "📊 Dataset Overview",
     "📈 Results & Insights",
     "⏰ Model Demo Hourly",
@@ -44,6 +45,50 @@ tab1, tab4, tab2, tab3, tab6, tab5 = st.tabs([
     "✅ Conclusion",
     "ℹ️ About"
 ])
+
+# ---------------------------
+# TAB 0 - Goals & Value
+# ---------------------------
+with tab0:
+    st.header("🎯 Project Goal & Value")
+    st.markdown(" ")
+
+    left, right = st.columns([2, 1], gap="large")
+
+    with left:
+        st.subheader("🚀  Project Goal")
+        st.markdown(" ")
+        st.markdown("""
+        The goal of this project was to **predict bike rental demand** using supervised machine learning,  
+        and evaluate whether ML models could outperform a simple baseline (average rentals).
+        """)
+
+        st.markdown(" ")
+        st.markdown(" ")
+        st.markdown(" ")
+        st.markdown(" ")
+
+        st.subheader("📌  How this creates value for bike sharing companies")
+        st.subheader("in Washington D.C.:")
+        st.markdown(" ")
+        st.markdown("""
+        - 🚲 **Operational efficiency:** Better allocation of bikes across stations based on predicted demand.  
+                    
+        - 😀 **Customer satisfaction:** Reduces empty stations and overcrowded ones, improving user experience.  
+                    
+        - 🛠️ **Strategic planning:** Seasonal and hourly insights support staffing, pricing, and maintenance decisions.  
+                    
+        - 🌍 **Sustainability:** Reliable service encourages bike usage, helping reduce car traffic and emissions.  
+        """)
+
+    with right:
+        st.image("bikeshare4.jpg")
+        st.caption("📸 Photo: Maxim Berg on Unsplash")
+
+
+    st.markdown("---") 
+    st.markdown("Created by Sheila Géa")
+
 
 # ---------------------------
 # TAB 1 -  Dataset Description
@@ -61,6 +106,7 @@ with tab1:
 **The Bike Sharing Dataset** comes from the Capital Bikeshare system in Washington D.C. (2011–2012). 
  
 It includes **hourly and daily records** of bike rentals, along with:
+
 
 - **Weather conditions** (temperature, humidity, windspeed, weather category)  
 
@@ -385,31 +431,40 @@ with tab4:
     st.header("📈 Results & Insights")
     st.markdown(" ")
 
-    # === New Intro ===
-    st.markdown(
-        """
-        To evaluate bike rental demand, I trained and tested multiple **supervised regression models**
-        on both the **daily** and **hourly** datasets.  
-        
-        The workflow included:
-        - Train/test split and preprocessing (scaling + one-hot encoding).  
-        - A simple **baseline** (predicting the mean) for comparison.  
-        - Training of several regression models:  
-          - **Linear Regression**  
-          - **Decision Tree Regressor**  
-          - **Random Forest Regressor**  
-          - **Gradient Boosting Regressor**  
-        - Hyperparameter tuning with **GridSearchCV + 5-fold cross-validation** for the top 3 models.  
+    left, right = st.columns([2, 1], gap="large")
 
-        The goal was to minimize prediction error (MAE/RMSE) and maximize explained variance (R²).
-        """
-    )
+    with left:
+        st.markdown(
+            """
+            To evaluate bike rental demand, I trained and tested multiple **supervised regression models**
+            on both the **daily** and **hourly** datasets.  
+            
+            The workflow included:
+            - Train/test split and preprocessing (scaling + one-hot encoding).  
+            - A simple **baseline** (predicting the mean) for comparison.  
+            - Training of several regression models:  
+            - **Linear Regression**  
+            - **Decision Tree Regressor**  
+            - **Random Forest Regressor**  
+            - **Gradient Boosting Regressor**  
+            - Hyperparameter tuning with **GridSearchCV + 5-fold cross-validation** for the top 3 models.  
+
+            The goal was to minimize prediction error (**MAE / RMSE**) and maximize explained variance (**R²**).
+            """
+        )
+
+    with right:
+        st.image("bikeshare5.jpg", width=400)
+        st.caption("📸 Photo: Jan Antonin Kolar on Unsplash")
+
 
     st.markdown("---")
 
     # ===== 1) Quick Summary cards =====
-    st.subheader("📌 Summary vs Baseline")
+    st.subheader("📌 Summary vs Baseline — MAE")
     st.markdown(" ")
+
+    # ===  MAE comparison ===
 
     # Reported metrics (from your notebook runs)
     # Baselines
@@ -450,8 +505,99 @@ with tab4:
 
     st.markdown("---")
 
+
+    # === RMSE comparison ===
+
+    st.subheader("📌 Summary vs Baseline — RMSE")
+
+    # Compute baseline RMSE from data (≈ std of cnt when predicting mean)
+    # (We read the CSVs here to keep this block self-contained.)
+    day_cnt_std   = pd.read_csv("day.csv")["cnt"].std()
+    hour_cnt_std  = pd.read_csv("hour.csv")["cnt"].std()
+
+    baseline_rmse_daily  = float(day_cnt_std)
+    baseline_rmse_hourly = float(hour_cnt_std)
+
+    # Best models (you already defined these above; reusing for clarity)
+    # daily_best_rmse = 641.99
+    # hourly_best_rmse = 46.69
+
+    # Improvements (%)
+    daily_rmse_impr  = (baseline_rmse_daily  - daily_best_rmse)  / baseline_rmse_daily  * 100
+    hourly_rmse_impr = (baseline_rmse_hourly - hourly_best_rmse) / baseline_rmse_hourly * 100
+
+    r1, r2 = st.columns(2)
+    with r1:
+        st.markdown("**Daily (day.csv)**")
+        st.metric(
+            label="RMSE (Baseline → Best GBR)",
+            value=f"{daily_best_rmse:.0f}",
+            delta=f"-{daily_rmse_impr:.1f}% vs baseline (~{baseline_rmse_daily:.0f})"
+        )
+        st.caption("Lower is better — penalizes large errors more than MAE.")
+
+    with r2:
+        st.markdown("**Hourly (hour.csv)**")
+        st.metric(
+            label="RMSE (Baseline → Best GBR)",
+            value=f"{hourly_best_rmse:.0f}",
+            delta=f"-{hourly_rmse_impr:.1f}% vs baseline (~{baseline_rmse_hourly:.0f})"
+        )
+        st.caption("Lower is better — penalizes large errors more than MAE.")
+
+
+    st.markdown("---")
+
+    # === R² comparison ===
+    
+    st.subheader("📌 Summary — R² (Explained Variance)")
+
+    baseline_r2_daily  = 0.00
+    baseline_r2_hourly = 0.00
+
+    s1, s2 = st.columns(2)
+    with s1:
+        st.markdown("**Daily (day.csv)**")
+        st.metric(
+            label="R² (Best GBR)",
+            value=f"{daily_best_r2:.2f}",
+            delta=f"+{daily_best_r2 - baseline_r2_daily:.2f} vs baseline ({baseline_r2_daily:.2f})"
+        )
+        st.caption("Closer to 1 is better — fraction of variance explained by the model.")
+
+    with s2:
+        st.markdown("**Hourly (hour.csv)**")
+        st.metric(
+            label="R² (Best GBR)",
+            value=f"{hourly_best_r2:.2f}",
+            delta=f"+{hourly_best_r2 - baseline_r2_hourly:.2f} vs baseline ({baseline_r2_hourly:.2f})"
+        )
+        st.caption("Closer to 1 is better — fraction of variance explained by the model.")
+        
+
+    st.markdown("---")
+
+
+    # === Explanation of metrics ===
+
+    st.subheader("ℹ️ What do these metrics mean?")
+    st.markdown(" ")
+    st.markdown("""
+    - **MAE (Mean Absolute Error):** average difference between predicted rentals and actual rentals.  
+    Example: MAE ≈ 30 → predictions are off by about 30 bikes/hour.  
+
+    - **RMSE (Root Mean Squared Error):** similar to MAE, but penalizes larger mistakes more strongly.  
+    Example: RMSE ≈ 47 → big errors in some hours weigh more.  
+
+    - **R² (Coefficient of Determination):** measures how well the model explains the variance in the data.  
+    Example: R² = 0.93 → the model explains **93% of the variability** in hourly bike rentals.  
+    """)
+
+    st.markdown("---")
+
         
     # ===== 2) Detailed tables =====
+
     st.subheader("🔬 Tuned Models — Test Set Performance")
     st.markdown(" ")
 
@@ -623,26 +769,6 @@ https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset
 
     st.markdown("---")
 
-    st.subheader("🧠 Challenges & Learnings")
-    st.markdown("""
-- Applied a complete ML workflow: **EDA → preprocessing → training → evaluation**; 
-- Understood and handled **normalized features** (temp, atemp, humidity, windspeed);  
-- Compared models against a **baseline** (mean predictor) to prove value;
-- Practiced **GridSearchCV** with **K-fold cross-validation**.
-""")
-
-    st.markdown("---")
-
-    st.subheader("🚀 Ideas for Future Improvements")
-    st.markdown("""
-
-- Add external signals (holidays/events calendar, **weather forecast**);
-- Deploy a live **dashboard** for real-time demand prediction; 
-- Try deep learning models (e.g., Neural Networks) for time-series data.  
-     
-""")
-
-    st.markdown("---")
 
     st.header("👩🏻‍💻 Built by")
     st.subheader("Sheila Géa")
@@ -665,32 +791,41 @@ with tab6:
     st.markdown(" ") 
 
     st.markdown("""
-### 🎯 Project Goal
-The goal of this project was to **predict bike rental demand** using supervised machine learning,  
-and evaluate whether ML models could outperform a simple baseline (average rentals).
 
----
-
-### 🚀 Key Result
+### 📖 Key Result
 The machine learning models — especially **Gradient Boosting** — achieved strong predictive accuracy,  
 reducing forecast errors by over **75% compared to baseline predictions**.
 
 ---
 
-### 📌 How this creates value for bike sharing companies in Washington D.C.:
-
-- 🚲 **Operational efficiency:** Better allocation of bikes across stations based on predicted demand.  
-- 😀 **Customer satisfaction:** Reduces empty stations and overcrowded ones, improving user experience.  
-- 🛠️ **Strategic planning:** Seasonal and hourly insights support staffing, pricing, and maintenance decisions.  
-- 🌍 **Sustainability:** Reliable service encourages bike usage, helping reduce car traffic and emissions.  
-
----
-
-### ✅ Takeaway
+### 💻 Takeaway
 By moving from a simple baseline predictor to advanced ML models,  
 bike sharing companies can **optimize resources, improve service quality,  
 and contribute to a greener urban mobility system**.
+                
 """)
+    
+    st.markdown("---")
+    
+    st.subheader("🧠 Challenges & Learnings")
+    st.markdown("""
+- Applied a complete ML workflow: **EDA → preprocessing → training → evaluation**; 
+- Understood and handled **normalized features** (temp, atemp, humidity, windspeed);  
+- Compared models against a **baseline** (mean predictor) to prove value;
+- Practiced **GridSearchCV** with **K-fold cross-validation**.
+""")
+
+    st.markdown("---")
+
+    st.subheader("🚀 Ideas for Future Improvements")
+    st.markdown("""
+
+- Add external signals (holidays/events calendar, **weather forecast**);
+- Deploy a live **dashboard** for real-time demand prediction; 
+- Try deep learning models (e.g., Neural Networks) for time-series data.  
+     
+""")
+
 
     st.markdown("---") 
     st.markdown("Created by Sheila Géa")
